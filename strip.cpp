@@ -10,7 +10,11 @@ sielf (s)tripper
 #define _CRT_SECURE_NO_DEPRECATE
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
+#include <cstring>
+#include <stdint.h>
+
+using namespace std;
 #define mfree free
 
 
@@ -19,11 +23,11 @@ sielf (s)tripper
 
 extern int opt_info;
 
-typedef unsigned long  Elf32_Addr;	//Unsigned program address 4
-typedef unsigned short Elf32_Half;	//Unsigned medium integer  2
-typedef unsigned long  Elf32_Off; 	//Unsigned file offset     4
-typedef          long  Elf32_Sword; 	//Signed large integer     4
-typedef unsigned long  Elf32_Word; 	//Unsigned large integer   4
+typedef uint32_t  Elf32_Addr;	//Unsigned program address 4
+typedef uint16_t  Elf32_Half;	//Unsigned medium integer  2
+typedef uint32_t  Elf32_Off; 	//Unsigned file offset     4
+typedef int32_t   Elf32_Sword; 	//Signed large integer     4
+typedef uint32_t  Elf32_Word; 	//Unsigned large integer   4
 
 //ELF Header
 //e_ident[] Identification Indexes
@@ -280,7 +284,13 @@ int ReadElf(char * filename)
   if ((fin=fopen(filename,"rb"))==NULL) return -1;
   if (fread(&ehdr,sizeof(Elf32_Ehdr),1,fin)!=1) return -2;
 
-  if (*((long *)ehdr.e_ident)!=0x464C457F) return -3;
+    if (ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
+        ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
+        ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
+        ehdr.e_ident[EI_MAG3] != ELFMAG3) {
+        cout << "Elf Header not found";
+        return -3;
+    }
 
 if(opt_info){  cout << "Elf header"<<endl;
   cout << "ehdr.e_entry:"<<ehdr.e_entry<<endl;
@@ -411,6 +421,7 @@ if (fwrite(&p,1,np*sizeof(Elf32_Phdr),f)!=np*sizeof(Elf32_Phdr)) return -4;
 newsz=ftell(f);
 
 fclose(f);
+return 0;
 };
 //--------------------------------------------------
 
