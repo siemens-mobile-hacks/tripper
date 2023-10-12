@@ -288,7 +288,7 @@ int ReadElf(char * filename)
         ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
         ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
         ehdr.e_ident[EI_MAG3] != ELFMAG3) {
-        cout << "Elf Header not found";
+        cout << "ELF header not found\n";
         return -3;
     }
 
